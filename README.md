@@ -1,12 +1,12 @@
-# 📝 Blogify - Headless Blogging Platform
+# Blogify - Headless Blogging Platform
 
 Une plateforme de blogging headless complète construite avec AWS Lambda, API Gateway, DynamoDB, et S3.
 
-## 🎯 Objectif du Projet
+## Objectif du Projet
 
 Blogify est une solution backend scalable pour la gestion de contenu de blog, offrant une API REST complète pour créer, gérer et publier du contenu. La plateforme supporte l'authentification des utilisateurs, les rôles, la gestion des médias et les commentaires.
 
-## 🏗️ Architecture
+## Architecture
 
 ### Services AWS Utilisés
 
@@ -44,7 +44,7 @@ blogify/
 └── README.md             # Documentation
 ```
 
-## ⚙️ Installation
+## Installation
 
 ### Prérequis
 
@@ -80,7 +80,7 @@ aws configure
 npm install -g serverless
 ```
 
-## 🚀 Déploiement
+## Déploiement
 
 ### Déploiement en développement
 
@@ -108,7 +108,7 @@ API Gateway URL: https://xxxxxxxxxx.execute-api.eu-west-1.amazonaws.com/dev
 
 Sauvegardez cette URL pour les tests Postman !
 
-## 📚 Documentation API
+## Documentation API
 
 ### Base URL
 
@@ -118,7 +118,7 @@ https://xxxxxxxxxx.execute-api.eu-west-1.amazonaws.com/dev
 
 ---
 
-## 🔐 Authentification
+## Authentification
 
 ### 1. Register (Inscription)
 
@@ -189,7 +189,7 @@ https://xxxxxxxxxx.execute-api.eu-west-1.amazonaws.com/dev
 
 ---
 
-## 👤 Gestion des Utilisateurs
+## Gestion des Utilisateurs
 
 ### 3. Get User Profile
 
@@ -240,7 +240,7 @@ Authorization: Bearer <token>
 
 ---
 
-## 📄 Gestion des Articles (Posts)
+## Gestion des Articles (Posts)
 
 ### 5. Create Post
 
@@ -373,7 +373,7 @@ Authorization: Bearer <token>
 
 ---
 
-## 🖼️ Gestion des Médias
+## Gestion des Médias
 
 ### 12. Upload Media
 
@@ -451,7 +451,7 @@ Authorization: Bearer <token>
 
 ---
 
-## 💬 Gestion des Commentaires (Optionnel)
+## Gestion des Commentaires (Optionnel)
 
 ### 16. Create Comment
 
@@ -529,7 +529,7 @@ Authorization: Bearer <token>
 
 ---
 
-## 🧪 Tests avec Postman
+## Tests avec Postman
 
 ### 1. Importer la Collection
 
@@ -587,7 +587,7 @@ Header: Authorization: Bearer {{token}}
 
 ---
 
-## 🔒 Sécurité
+## Sécurité
 
 ### Authentification JWT
 
@@ -609,7 +609,7 @@ Header: Authorization: Bearer {{token}}
 
 ---
 
-## 📊 Monitoring et Logs
+## Monitoring et Logs
 
 ### Voir les Logs
 
@@ -627,7 +627,7 @@ Tous les logs sont automatiquement envoyés vers CloudWatch Logs.
 
 ---
 
-## 🚧 Améliorations Futures
+## Améliorations Futures
 
 ### Fonctionnalités à Ajouter
 
@@ -649,7 +649,7 @@ Tous les logs sont automatiquement envoyés vers CloudWatch Logs.
 
 ---
 
-## 💰 Estimation des Coûts
+## Estimation des Coûts
 
 ### Free Tier AWS (12 premiers mois)
 
@@ -668,7 +668,7 @@ Tous les logs sont automatiquement envoyés vers CloudWatch Logs.
 
 ---
 
-## 🛠️ Dépannage
+## Dépannage
 
 ### Erreur: "User: ... is not authorized to perform: ..."
 
@@ -688,7 +688,7 @@ CORS est activé par défaut. Vérifiez que le header `Authorization` est correc
 
 ---
 
-## 🤝 Support
+## Support
 
 Pour questions ou problèmes, consultez :
 
@@ -698,10 +698,8 @@ Pour questions ou problèmes, consultez :
 
 ---
 
-## 📄 Licence
+## Licence
 
 MIT
 
 ---
-
-**Développé avec ❤️ pour le cours Serverless Computing**
