@@ -1,0 +1,40 @@
+{
+  "name": "blogify-platform",
+  "version": "1.0.0",
+  "description": "Headless blogging platform built with AWS Lambda and Serverless Framework",
+  "main": "handler.js",
+  "scripts": {
+    "deploy": "serverless deploy",
+    "deploy:dev": "serverless deploy --stage dev",
+    "deploy:prod": "serverless deploy --stage prod",
+    "remove": "serverless remove",
+    "logs": "serverless logs -f",
+    "invoke": "serverless invoke -f",
+    "info": "serverless info"
+  },
+  "keywords": [
+    "serverless",
+    "aws",
+    "lambda",
+    "blog",
+    "api",
+    "dynamodb",
+    "s3"
+  ],
+  "author": "Lyes Badii",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.515.0",
+    "@aws-sdk/lib-dynamodb": "^3.515.0",
+    "@aws-sdk/client-s3": "^3.515.0",
+    "@aws-sdk/s3-request-presigner": "^3.515.0",
+    "@aws-sdk/client-secrets-manager": "^3.515.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "serverless": "^3.38.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

@@ -1,0 +1,436 @@
+service: blogify-platform
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: eu-west-1
+  stage: ${opt:stage, 'dev'}
+
+  environment:
+    USERS_TABLE: ${self:custom.usersTable}
+    POSTS_TABLE: ${self:custom.postsTable}
+    COMMENTS_TABLE: ${self:custom.commentsTable}
+    MEDIA_TABLE: ${self:custom.mediaTable}
+    MEDIA_BUCKET: ${self:custom.mediaBucket}
+    JWT_SECRET_NAME: ${self:custom.jwtSecretName}
+    STAGE: ${self:provider.stage}
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:Query
+          Resource:
+            - "arn:aws:dynamodb:${aws:region}:*:table/${self:custom.usersTable}"
+            - "arn:aws:dynamodb:${aws:region}:*:table/${self:custom.usersTable}/index/*"
+
+        - Effect: Allow
+          Action:
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:Query
+            - dynamodb:Scan
+          Resource:
+            - "arn:aws:dynamodb:${aws:region}:*:table/${self:custom.postsTable}"
+            - "arn:aws:dynamodb:${aws:region}:*:table/${self:custom.postsTable}/index/*"
+
+        - Effect: Allow
+          Action:
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:DeleteItem
+            - dynamodb:Query
+            - dynamodb:UpdateItem
+          Resource:
+            - "arn:aws:dynamodb:${aws:region}:*:table/${self:custom.commentsTable}"
+            - "arn:aws:dynamodb:${aws:region}:*:table/${self:custom.commentsTable}/index/*"
+
+        - Effect: Allow
+          Action:
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:DeleteItem
+            - dynamodb:Query
+          Resource:
+            - "arn:aws:dynamodb:${aws:region}:*:table/${self:custom.mediaTable}"
+            - "arn:aws:dynamodb:${aws:region}:*:table/${self:custom.mediaTable}/index/*"
+
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:GetObject
+            - s3:DeleteObject
+          Resource: "arn:aws:s3:::${self:custom.mediaBucket}/*"
+
+        - Effect: Allow
+          Action:
+            - secretsmanager:GetSecretValue
+          Resource: !Ref JWTSecret
+
+functions:
+  # AUTH
+  register:
+    handler: handlers/auth.register
+    events:
+      - http:
+          path: auth/register
+          method: post
+          cors: true
+
+  login:
+    handler: handlers/auth.login
+    events:
+      - http:
+          path: auth/login
+          method: post
+          cors: true
+
+  authorizer:
+    handler: handlers/authorizer.authorize
+
+  # USERS
+  getProfile:
+    handler: handlers/users.getProfile
+    events:
+      - http:
+          path: users/{userId}
+          method: get
+          cors: true
+          authorizer:
+            name: authorizer
+            resultTtlInSeconds: 0
+
+  updateProfile:
+    handler: handlers/users.updateProfile
+    events:
+      - http:
+          path: users/{userId}
+          method: put
+          cors: true
+          authorizer:
+            name: authorizer
+            resultTtlInSeconds: 0
+
+  # POSTS
+  createPost:
+    handler: handlers/posts.createPost
+    events:
+      - http:
+          path: posts
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            resultTtlInSeconds: 0
+
+  getPost:
+    handler: handlers/posts.getPost
+    events:
+      - http:
+          path: posts/{postId}
+          method: get
+          cors: true
+
+  getAllPosts:
+    handler: handlers/posts.getAllPosts
+    events:
+      - http:
+          path: posts
+          method: get
+          cors: true
+
+  updatePost:
+    handler: handlers/posts.updatePost
+    events:
+      - http:
+          path: posts/{postId}
+          method: put
+          cors: true
+          authorizer:
+            name: authorizer
+            resultTtlInSeconds: 0
+
+  deletePost:
+    handler: handlers/posts.deletePost
+    events:
+      - http:
+          path: posts/{postId}
+          method: delete
+          cors: true
+          authorizer:
+            name: authorizer
+            resultTtlInSeconds: 0
+
+  getPostsByAuthor:
+    handler: handlers/posts.getPostsByAuthor
+    events:
+      - http:
+          path: posts/author/{userId}
+          method: get
+          cors: true
+
+  searchPosts:
+    handler: handlers/posts.searchPosts
+    events:
+      - http:
+          path: posts/search
+          method: get
+          cors: true
+
+  # MEDIA
+  uploadMedia:
+    handler: handlers/media.uploadMedia
+    timeout: 30
+    events:
+      - http:
+          path: media/upload
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            resultTtlInSeconds: 0
+
+  getMedia:
+    handler: handlers/media.getMedia
+    events:
+      - http:
+          path: media/{mediaId}
+          method: get
+          cors: true
+
+  listUserMedia:
+    handler: handlers/media.listUserMedia
+    events:
+      - http:
+          path: media/user/{userId}
+          method: get
+          cors: true
+          authorizer:
+            name: authorizer
+            resultTtlInSeconds: 0
+
+  deleteMedia:
+    handler: handlers/media.deleteMedia
+    events:
+      - http:
+          path: media/{mediaId}
+          method: delete
+          cors: true
+          authorizer:
+            name: authorizer
+            resultTtlInSeconds: 0
+
+  # COMMENTS
+  createComment:
+    handler: handlers/comments.createComment
+    events:
+      - http:
+          path: posts/{postId}/comments
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            resultTtlInSeconds: 0
+
+  getComments:
+    handler: handlers/comments.getComments
+    events:
+      - http:
+          path: posts/{postId}/comments
+          method: get
+          cors: true
+
+  updateComment:
+    handler: handlers/comments.updateComment
+    events:
+      - http:
+          path: comments/{commentId}
+          method: put
+          cors: true
+          authorizer:
+            name: authorizer
+            resultTtlInSeconds: 0
+
+  deleteComment:
+    handler: handlers/comments.deleteComment
+    events:
+      - http:
+          path: comments/{commentId}
+          method: delete
+          cors: true
+          authorizer:
+            name: authorizer
+            resultTtlInSeconds: 0
+
+  moderateComment:
+    handler: handlers/comments.moderateComment
+    events:
+      - http:
+          path: comments/{commentId}/moderate
+          method: patch
+          cors: true
+          authorizer:
+            name: authorizer
+            resultTtlInSeconds: 0
+
+custom:
+  usersTable: blogify-users-${self:provider.stage}
+  postsTable: blogify-posts-${self:provider.stage}
+  commentsTable: blogify-comments-${self:provider.stage}
+  mediaTable: blogify-media-${self:provider.stage}
+  mediaBucket: blogify-media-${self:provider.stage}-${aws:accountId}
+  jwtSecretName: blogify-jwt-secret-${self:provider.stage}
+
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.usersTable}
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: email
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: EmailIndex
+            KeySchema:
+              - AttributeName: email
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+
+    PostsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.postsTable}
+        AttributeDefinitions:
+          - AttributeName: postId
+            AttributeType: S
+          - AttributeName: authorId
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
+          - AttributeName: status
+            AttributeType: S
+        KeySchema:
+          - AttributeName: postId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: AuthorIndex
+            KeySchema:
+              - AttributeName: authorId
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: StatusIndex
+            KeySchema:
+              - AttributeName: status
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+
+    CommentsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.commentsTable}
+        AttributeDefinitions:
+          - AttributeName: commentId
+            AttributeType: S
+          - AttributeName: postId
+            AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
+        KeySchema:
+          - AttributeName: commentId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: PostIndex
+            KeySchema:
+              - AttributeName: postId
+                KeyType: HASH
+              - AttributeName: createdAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+
+    MediaTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.mediaTable}
+        AttributeDefinitions:
+          - AttributeName: mediaId
+            AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: uploadedAt
+            AttributeType: S
+        KeySchema:
+          - AttributeName: mediaId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: UserIndex
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: uploadedAt
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+
+    MediaBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.mediaBucket}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins:
+                - "*"
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+              AllowedHeaders:
+                - "*"
+              MaxAge: 3600
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+
+    JWTSecret:
+      Type: AWS::SecretsManager::Secret
+      Properties:
+        Name: ${self:custom.jwtSecretName}
+        Description: JWT Secret for Blogify authentication
+        GenerateSecretString:
+          SecretStringTemplate: '{"jwtSecret":""}'
+          GenerateStringKey: "jwtSecret"
+          PasswordLength: 64
+          ExcludeCharacters: '"@/\\'
+
+  Outputs:
+    ApiGatewayUrl:
+      Description: API Gateway endpoint URL
+      Value:
+        Fn::Sub: https://${ApiGatewayRestApi}.execute-api.${AWS::Region}.amazonaws.com/${self:provider.stage}
