@@ -1,4 +1,3 @@
-// utils/validation.js
 "use strict";
 
 /**
@@ -70,10 +69,9 @@ function validateRegistration(data) {
     errors.push(passwordValidation.message);
   }
 
-  // Validation du rôle si fourni
-  if (data.role && !["admin", "editor", "author"].includes(data.role)) {
-    errors.push("Invalid role. Must be admin, editor, or author");
-  }
+  // Le rôle est toujours "author" par défaut
+  // Si on détecte qu'un rôle a été envoyé, on l'ignore silencieusement
+  // (on ne génère pas d'erreur pour ne pas révéler cette information à un attaquant)
 
   return {
     valid: errors.length === 0,

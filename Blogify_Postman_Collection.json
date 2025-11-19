@@ -1,8 +1,8 @@
 {
   "info": {
-    "name": "Blogify API - Complete Collection",
-    "_postman_id": "blogify-collection-v1",
-    "description": "Collection complète pour tester l'API Blogify Platform",
+    "name": "Blogify API - Complete Collection (SECURED)",
+    "_postman_id": "blogify-collection-v1-secured",
+    "description": "Collection complète pour tester l'API Blogify Platform - VERSION SÉCURISÉE",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -59,13 +59,14 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123\",\n  \"name\": \"John Doe\",\n  \"role\": \"author\"\n}"
+              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123\",\n  \"name\": \"John Doe\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register",
               "host": ["{{baseUrl}}"],
               "path": ["auth", "register"]
-            }
+            },
+            "description": " SÉCURISÉ: Le rôle est automatiquement 'author'. Impossible de se créer admin."
           }
         },
         {

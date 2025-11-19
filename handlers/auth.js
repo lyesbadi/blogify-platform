@@ -1,4 +1,3 @@
-// handlers/auth.js
 "use strict";
 
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
@@ -58,9 +57,12 @@ function verifyPassword(password, hash, salt) {
  * {
  *   "email": "user@example.com",
  *   "password": "SecurePass123",
- *   "name": "John Doe",
- *   "role": "author" (optionnel: admin, editor, author)
+ *   "name": "John Doe"
  * }
+ *
+ * SÉCURITÉ: Le rôle n'est PLUS accepté dans le body.
+ * Tous les nouveaux utilisateurs sont "author" par défaut.
+ * Seul un admin peut changer le rôle via un endpoint dédié (à implémenter).
  */
 module.exports.register = async (event) => {
   console.log("=== REGISTER USER ===");
@@ -101,7 +103,7 @@ module.exports.register = async (event) => {
       userId: userId,
       email: body.email.toLowerCase().trim(),
       name: validation.sanitizeString(body.name),
-      role: body.role || "author", // Par défaut: author
+      role: "author",
       passwordHash: hash,
       passwordSalt: salt,
       bio: body.bio || "",
@@ -109,6 +111,9 @@ module.exports.register = async (event) => {
       updatedAt: now,
       isActive: true,
     };
+
+    // IMPORTANT: Le body.role est complètement ignoré
+    // Si un attaquant envoie "role": "admin", ça ne sera pas pris en compte
 
     // Sauvegarder dans DynamoDB
     await dynamodb.send(
@@ -119,7 +124,7 @@ module.exports.register = async (event) => {
       })
     );
 
-    console.log(`User registered successfully: ${userId}`);
+    console.log(`User registered successfully: ${userId} with role: author`);
 
     // Générer un token JWT
     const jwtSecret = await secrets.getJWTSecret();
