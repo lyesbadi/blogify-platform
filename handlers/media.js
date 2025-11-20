@@ -1,4 +1,3 @@
-// handlers/media.js
 "use strict";
 
 const { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");

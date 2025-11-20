@@ -1,4 +1,3 @@
-// handlers/authorizer.js
 "use strict";
 
 const jwt = require("../utils/jwt");

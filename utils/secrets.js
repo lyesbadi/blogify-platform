@@ -1,4 +1,3 @@
-// utils/secrets.js
 "use strict";
 
 const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager");

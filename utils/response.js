@@ -1,4 +1,3 @@
-// utils/response.js
 "use strict";
 
 /**

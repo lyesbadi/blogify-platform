@@ -281,17 +281,26 @@ module.exports.updatePost = async (event) => {
     const expressionAttributeValues = {};
     const expressionAttributeNames = {};
 
-    if (body.title) {
-      const validationResult = validation.validatePost({ title: body.title, content: "dummy" });
-      if (!validationResult.valid) {
-        return response.badRequest("Invalid title", validationResult.errors);
+    // VALIDATION ET UPDATE DU TITLE
+    if (body.title !== undefined) {
+      // Valider le title seulement (minimum 3 caractères)
+      if (typeof body.title !== "string" || body.title.trim().length < 3) {
+        return response.badRequest("Title must be at least 3 characters long");
+      }
+      if (body.title.length > 200) {
+        return response.badRequest("Title must not exceed 200 characters");
       }
       updates.push("#title = :title");
       expressionAttributeNames["#title"] = "title";
       expressionAttributeValues[":title"] = validation.sanitizeString(body.title);
     }
 
-    if (body.content) {
+    // VALIDATION ET UPDATE DU CONTENT
+    if (body.content !== undefined) {
+      // Valider le content seulement (minimum 10 caractères)
+      if (typeof body.content !== "string" || body.content.trim().length < 10) {
+        return response.badRequest("Content must be at least 10 characters long");
+      }
       updates.push("#content = :content");
       expressionAttributeNames["#content"] = "content";
       expressionAttributeValues[":content"] = validation.sanitizeString(body.content);
@@ -500,14 +509,14 @@ module.exports.searchPosts = async (event) => {
       return response.badRequest("Search query must be at least 2 characters");
     }
 
-    const searchTerm = searchQuery.toLowerCase().trim();
+    const searchTerm = searchQuery.trim();
 
     // Scan avec filtre (pas optimal mais simple pour commencer)
+    // Note: DynamoDB contains() est case-sensitive
     const result = await dynamodb.send(
       new ScanCommand({
         TableName: POSTS_TABLE,
-        FilterExpression:
-          "#status = :published AND (contains(lower(#title), :search) OR contains(lower(#content), :search))",
+        FilterExpression: "#status = :published AND (contains(#title, :search) OR contains(#content, :search))",
         ExpressionAttributeNames: {
           "#status": "status",
           "#title": "title",

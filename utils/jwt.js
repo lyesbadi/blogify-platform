@@ -1,4 +1,3 @@
-// utils/jwt.js
 "use strict";
 
 const crypto = require("crypto");

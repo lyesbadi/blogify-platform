@@ -1,4 +1,3 @@
-// handlers/users.js
 "use strict";
 
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
